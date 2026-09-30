@@ -1,25 +1,21 @@
-# Local development and generated output
-psv/.tools/
-psv/build*/
-psv/dist/
-psv/data*/
-psv/recovery/
-**/__pycache__/
-*.pyc
-**/bin/
-**/obj/
-.godot/
-.mono/
+build*/
+data/
+dist/
+.tools/
+prepare/bin/
+prepare/obj/
 *.vpk
 *.self
 *.elf
+data*/
+recovery/
 *.velf
-# Original game resources and generated opening media
+__pycache__/
+*.pyc
+assets/opening.mp4
+assets/opening.idx
 *.a
 *.v
-psv/assets/opening.mp4
-psv/assets/opening.idx
-# Credentials and local settings
 .env
 .env.*
 *.keystore

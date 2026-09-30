@@ -23,4 +23,4 @@ foreach($pkg in $lock.packages){
     & $tar --force-local -xJf $archive -C (Join-Path $tools 'vitasdk/arm-vita-eabi')
     if($LASTEXITCODE -ne 0){throw ('Package extraction failed: '+$pkg.name)}
 }
-Write-Output 'VitaSDK is ready. Run ./psv/tools/build-vita.ps1 from the repository root.'
+Write-Output 'VitaSDK is ready. Run ./tools/build-vita.ps1 from the repository root.'

@@ -1,6 +1,6 @@
 # 安装与游玩说明
 
-Tenshi Vita 是从本项目 Godot / C# 版本移植的独立 PSV 程序，PSV 上不需要安装 Godot 或 .NET。安装包固定名为 **`tenshi-vita.vpk`**，应用 ID 为 `TNSH00001`；当前内部版本为 `00.26`。
+Tenshi Vita 是从 [Godot / C# 重制项目](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot) 移植的独立 PSV 程序。本仓库只包含 PSV 移植项目，PSV 上不需要安装 Godot 或 .NET。安装包固定名为 **`tenshi-vita.vpk`**，应用 ID 为 `TNSH00001`；当前内部版本为 `00.26`。
 
 下载：[0.26 测试版发布页](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.26) · [tenshi-vita.vpk](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/download/v0.26/tenshi-vita.vpk)。
 

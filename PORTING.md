@@ -1,10 +1,10 @@
 # Tenshi Vita · 原始资源直读版
 
-基于本仓库 Godot / C# 游戏移植的独立 C++ / SDL2 PSV 版本，PSV 上无需 Godot 或 .NET。当前为 **0.26 测试版**：按用户要求内置 H.264/AAC 片头，接入 SceVideodec/SceAudiodec 直接硬解；Logo 改为 GPU 合成。实机日志已确认 Logo 稳定在约 60 帧；新片头硬解路径仍需实机复验。保留 0.17 的行为差异修复、内置思源黑体及项目图标。
+基于[Godot / C# 游戏](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot)移植的独立 C++ / SDL2 PSV 版本，PSV 上无需 Godot 或 .NET。当前为 **0.26 测试版**：按用户要求内置 H.264/AAC 片头，接入 SceVideodec/SceAudiodec 直接硬解；Logo 改为 GPU 合成。实机日志已确认 Logo 稳定在约 60 帧；新片头硬解路径仍需实机复验。保留 0.17 的行为差异修复、内置思源黑体及项目图标。
 
 ## 安装
 
-玩家完整安装与操作步骤见 [INSTALL.md](INSTALL.md)。GitHub 发布页见 [Tenshi Vita Releases](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.26)。
+玩家完整安装与操作步骤见 [INSTALL.md](INSTALL.md)。GitHub 发布页见 [Tenshi Vita Releases](https://github.com/dorakyuraduang/TenshinoInai12gatsu-releases/tag/v0.26)。
 
 安装包固定为 `dist/tenshi-vita.vpk`，后续构建直接更新同名文件，不再额外生成带版本号的 VPK。当前包内版本为 `00.26`，升级时内部版本号仍正常更新。
 
@@ -139,39 +139,39 @@ PSV 无桌面字体选择器；在数据目录额外放入 `font-alt.ttf` 后，
 Windows 使用 PowerShell 7、Python 3 与 MSYS2 的 `tar`、`xz`、`bzip2`。从原片头重建还需要 PATH 中可用的 FFmpeg / FFprobe：
 
 ```powershell
-./psv/tools/bootstrap-windows.ps1 -MsysBin "D:/msys2/usr/bin"
+./tools/bootstrap-windows.ps1 -MsysBin "D:/msys2/usr/bin"
 # 从源码 ZIP 重建时，先准备内置片头与索引：
-python psv/tools/transcode-opening.py "D:/原始资源/openning.v"
-./psv/tools/build-vita.ps1
-python psv/tools/package-release.py
+python tools/transcode-opening.py "D:/原始资源/openning.v"
+./tools/build-vita.ps1
+python tools/package-release.py
 ```
 
-也可从同版本 VPK 中同时提取 `assets/opening.mp4` 与 `assets/opening.idx` 到 `psv/assets/`，然后跳过转码命令。仅提取 MP4 而没有索引无法完成打包。
+也可从同版本 VPK 中同时提取 `assets/opening.mp4` 与 `assets/opening.idx` 到 `assets/`，然后跳过转码命令。仅提取 MP4 而没有索引无法完成打包。
 
 发布脚本同样更新固定文件名 `dist/tenshi-vita.zip`、`dist/tenshi-vita-source.zip` 和 `dist/SHA256SUMS.txt`。过去生成的历史文件不会自动删除；安装时使用上面的固定 VPK。
 
-更新图标时运行 `python psv/tools/make-icon.py`（需 Pillow），读取项目根目录的 `icon.png`。预生成的 PSV 图标也随源码包附带。
+更新图标时运行 `python tools/make-icon.py "D:/原图/icon.png"`（需 Pillow），读取显式指定的原图；无需在仓库根目录存放原图。预生成的 PSV 图标也随源码包附带。
 
-工具放在 `psv/.tools/`，校验值见 `tools/dependencies.lock.json`。也可使用 VitaSDK 的 CMake：
+工具放在 `.tools/`，校验值见 `tools/dependencies.lock.json`。也可使用 VitaSDK 的 CMake：
 
 ```sh
-cmake -S psv -B psv/build-vita-cmake -DTENSHI_VITA=ON
-cmake --build psv/build-vita-cmake
+cmake -S . -B build-vita-cmake -DTENSHI_VITA=ON
+cmake --build build-vita-cmake
 ```
 
 ## 开发验证
 
-`prepare/` 只生成测试参考，不是玩家安装步骤。先生成剧情参考，再独立运行媒体和回想导出：
+`prepare/` 和参考导出工具只用于开发验证。运行 PSV 和构建 VPK 不需要 Godot 源码。若要重新生成与 Godot 对照的参考数据，先另外检出 [Godot 项目](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot)，然后通过 `GodotProjectRoot` 或 `--godot-root` 指定它的位置；该项目不随 PSV 仓库发布。先生成剧情参考，再独立运行媒体和回想导出：
 
 ```powershell
-dotnet run --project psv/prepare/Prepare.csproj -c Release -- "D:/原始资源" "psv/data-reference"
+dotnet run --project prepare/Prepare.csproj -c Release -p:GodotProjectRoot="D:/Godot参考项目" -- "D:/原始资源" "data-reference"
 $env:TENSHI_MEDIA_REFERENCE='1'
-dotnet run --project psv/prepare/Prepare.csproj -c Release -- "D:/原始资源" "psv/data-reference"
+dotnet run --project prepare/Prepare.csproj -c Release -p:GodotProjectRoot="D:/Godot参考项目" -- "D:/原始资源" "data-reference"
 Remove-Item Env:TENSHI_MEDIA_REFERENCE
 $env:TENSHI_REPLAY_REFERENCE='1'
-dotnet run --project psv/prepare/Prepare.csproj -c Release -- "D:/原始资源" "psv/data-reference"
+dotnet run --project prepare/Prepare.csproj -c Release -p:GodotProjectRoot="D:/Godot参考项目" -- "D:/原始资源" "data-reference"
 Remove-Item Env:TENSHI_REPLAY_REFERENCE
-python psv/tools/presentation-reference.py psv/data-reference
+python tools/presentation-reference.py data-reference --godot-root "D:/Godot参考项目"
 ```
 
 新增 `logo_test <原始资源目录>` 比较全部 64 种 Logo 变体，并运行 `movie_vita_test` 检查实机指针句柄、异步准备、缓冲、EOF 和释放顺序；后者使用 API 替身，不是物理设备验收。
@@ -184,8 +184,8 @@ tenshi.exe <原始资源目录> <测试模式> <帧数> <独立测试状态目�
 
 主机测试程序旁需有 `assets/SourceHanSansCN-Regular.otf`，状态目录不再要求 `font.ttf`。模式：`--story-smoke`、`--menu-smoke`、`--movie-smoke`、`--ending-smoke`、`--ui-smoke`、`--effects-smoke`、`--input-smoke`、`--startup-smoke`、`--restart-smoke`。UI 自检会写测试存档和设置，必须使用独立测试目录。SDL dummy 驱动允许离屏运行；没有截图输出。测试参考、状态、模拟器副本和工具缓存不进入发布包。
 
-启动参考由 `python psv/tools/startup-reference.py <原始资源目录> psv/data-reference` 抽取当前 Godot 源码生成。运行 `startup_test psv/data-reference <原始资源目录>` 比较脚本边界；将生成的 `startup.json` 放入新的独立测试状态目录，依次运行 `--startup-smoke` 和 `--restart-smoke`，验证真实文件与两次独立进程启动。
+启动参考由 `python tools/startup-reference.py <原始资源目录> data-reference --godot-root <Godot项目目录>` 抽取当前 Godot 源码生成。运行 `startup_test data-reference <原始资源目录>` 比较脚本边界；将生成的 `startup.json` 放入新的独立测试状态目录，依次运行 `--startup-smoke` 和 `--restart-smoke`，验证真实文件与两次独立进程启动。
 
 ## 许可
 
-原创代码采用根目录 [MIT](../LICENSE)，第三方许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。发行 ZIP 附带源代码、构建资料和第三方声明。
+原创代码采用根目录 [MIT](LICENSE)，第三方许可见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。发行 ZIP 附带源代码、构建资料和第三方声明。

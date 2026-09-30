@@ -7,8 +7,8 @@ def png_chunks(data):
         size=int.from_bytes(data[pos:pos+4],'big')
         yield data[pos+4:pos+8],data[pos+8:pos+8+size]
         pos+=12+size
-root=Path(__file__).resolve().parents[2]
-psv=root/'psv'; dist=psv/'dist'; dist.mkdir(exist_ok=True)
+psv=Path(__file__).resolve().parents[1]
+dist=psv/'dist'; dist.mkdir(exist_ok=True)
 source=dist/'tenshi-vita-source.zip'
 font_entry='assets/SourceHanSansCN-Regular.otf'
 video_entry='assets/opening.mp4'
@@ -27,21 +27,17 @@ allowed=[psv/'assets/opening.json', psv/'VIDEO_LOGO_FIXES_0.20.md', psv/'VIDEO_L
 for name in ['src','tests','tools','licenses','third_party','sce_sys']:
     allowed.extend(p for p in (psv/name).rglob('*') if p.is_file() and '__pycache__' not in p.parts)
 allowed.extend(p for p in (psv/'prepare').iterdir() if p.is_file() and (p.name.endswith('.cs.in') or p.suffix=='.csproj'))
-allowed.extend(psv/name for name in ['README.md','GITHUB_README.md','INSTALL.md','VALIDATION.md','THIRD_PARTY_NOTICES.md','CMakeLists.txt','.gitignore','.gdignore','.clang-format'])
-allowed.extend(root/name for name in ['LICENSE','THIRD_PARTY_NOTICES.md','icon.png'])
-allowed.extend(root/'Scripts'/name for name in ['Archive.cs','ScenarioScript.cs','ScenarioRuntime.cs','PxDecoder.cs','UiPxDecoder.cs','AudioDecoder.cs','VoiceDecoder.cs','MessageView.cs','OriginalEffectMath.cs','GameMain.cs'])
-allowed.extend((root/'Scripts').glob('GameMain.*.cs'))
+allowed.extend(psv/name for name in ['README.md','PORTING.md','INSTALL.md','LICENSE','VALIDATION.md','THIRD_PARTY_NOTICES.md','CMakeLists.txt','.gitignore','.gdignore','.clang-format'])
 with zipfile.ZipFile(source,'w',zipfile.ZIP_DEFLATED) as z:
-    z.write(psv/'GITHUB_README.md','README.md')
-    for p in sorted(set(allowed)):z.write(p,p.relative_to(root).as_posix())
-for name in ['README.md','INSTALL.md','VALIDATION.md','THIRD_PARTY_NOTICES.md','FONT_LICENSE.md','GODOT_PARITY_AUDIT.md','GODOT_PARITY_FIXES_0.17.md','VIDEO_LOGO_FIXES_0.20.md','VIDEO_LOGO_FIXES_0.21.md','VIDEO_LOGO_FIXES_0.22.md','VIDEO_LOGO_FIXES_0.23.md','UI_FIXES_0.24.md']:
+    for p in sorted(set(allowed)):z.write(p,p.relative_to(psv).as_posix())
+for name in ['README.md','PORTING.md','INSTALL.md','VALIDATION.md','THIRD_PARTY_NOTICES.md','FONT_LICENSE.md','GODOT_PARITY_AUDIT.md','GODOT_PARITY_FIXES_0.17.md','VIDEO_LOGO_FIXES_0.20.md','VIDEO_LOGO_FIXES_0.21.md','VIDEO_LOGO_FIXES_0.22.md','VIDEO_LOGO_FIXES_0.23.md','UI_FIXES_0.24.md']:
     text=(psv/name).read_text(encoding='utf-8-sig').replace('](../LICENSE)','](LICENSE)')
     (dist/name).write_text(text,encoding='utf-8')
-(dist/'LICENSE').write_bytes((root/'LICENSE').read_bytes())
+(dist/'LICENSE').write_bytes((psv/'LICENSE').read_bytes())
 # Keep public artifact names stable; the application version remains in param.sfo.
 release=dist/'tenshi-vita.zip'
 with zipfile.ZipFile(release,'w',zipfile.ZIP_DEFLATED) as z:
-    for name in ['tenshi-vita.vpk','tenshi-vita-source.zip','README.md','INSTALL.md','VALIDATION.md','THIRD_PARTY_NOTICES.md','FONT_LICENSE.md','GODOT_PARITY_AUDIT.md','GODOT_PARITY_FIXES_0.17.md','VIDEO_LOGO_FIXES_0.20.md','VIDEO_LOGO_FIXES_0.21.md','VIDEO_LOGO_FIXES_0.22.md','VIDEO_LOGO_FIXES_0.23.md','UI_FIXES_0.24.md','LICENSE']:z.write(dist/name,name)
+    for name in ['tenshi-vita.vpk','tenshi-vita-source.zip','README.md','PORTING.md','INSTALL.md','VALIDATION.md','THIRD_PARTY_NOTICES.md','FONT_LICENSE.md','GODOT_PARITY_AUDIT.md','GODOT_PARITY_FIXES_0.17.md','VIDEO_LOGO_FIXES_0.20.md','VIDEO_LOGO_FIXES_0.21.md','VIDEO_LOGO_FIXES_0.22.md','VIDEO_LOGO_FIXES_0.23.md','UI_FIXES_0.24.md','LICENSE']:z.write(dist/name,name)
     z.write(psv/'assets/source-han-sans.json','assets/source-han-sans.json')
     z.write(psv/'assets/opening.json','assets/opening.json')
     for p in (psv/'licenses').iterdir():

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <GodotProjectRoot Condition="'$(GodotProjectRoot)' == ''">$(MSBuildThisFileDirectory)../..</GodotProjectRoot>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- .cs.in keeps the independent converter out of the parent Godot build. -->
+    <Compile Include="*.cs.in" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/Archive.cs" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/ScenarioScript.cs" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/ScenarioRuntime.cs" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/PxDecoder.cs" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/UiPxDecoder.cs" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/AudioDecoder.cs" />
+    <Compile Include="$(GodotProjectRoot)/Scripts/VoiceDecoder.cs" />
+  </ItemGroup>
+  <Target Name="ValidateGodotProjectRoot" BeforeTargets="PrepareForBuild">
+    <Error Condition="!Exists('$(GodotProjectRoot)/Scripts/Archive.cs')"
+           Text="Godot reference source not found under $(GodotProjectRoot)/Scripts. Specify -p:GodotProjectRoot=the-original-Godot-project-directory." />
+  </Target>
+</Project>

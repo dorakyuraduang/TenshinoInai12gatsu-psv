@@ -8,7 +8,7 @@
 
 - [下载固定名称安装包 tenshi-vita.vpk](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/download/v0.26/tenshi-vita.vpk)
 - [查看全部发布文件及版本说明](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.26)
-- **[完整安装、操作、存档与排错说明](psv/INSTALL.md)**
+- **[完整安装、操作、存档与排错说明](INSTALL.md)**
 
 在可以安装自制软件的 PSV 上，用 VitaShell 安装 `tenshi-vita.vpk`。然后把自己持有的对应 GB18030 资源版的下列文件原样复制到 `ux0:/data/tenshi/`，无需解包：
 
@@ -42,17 +42,17 @@ ux0:/data/tenshi/
 
 ## 开发与验证
 
-- [构建步骤和移植说明](psv/README.md#构建)
-- [验证记录与设备测试边界](psv/VALIDATION.md)
-- [与 Godot 版的差异审计](psv/GODOT_PARITY_AUDIT.md)
-- [第三方组件和字体许可](psv/THIRD_PARTY_NOTICES.md)
+- [构建步骤和移植说明](PORTING.md#构建)
+- [验证记录与设备测试边界](VALIDATION.md)
+- [与 Godot 版的差异审计](GODOT_PARITY_AUDIT.md)
+- [第三方组件和字体许可](THIRD_PARTY_NOTICES.md)
 
-源代码位于 `psv/src/`，Windows 构建脚本位于 `psv/tools/`。`Scripts/` 保留生成开发参考所需的原 Godot 代码；玩家不需要运行这些工具。发行文件名固定为 `tenshi-vita.vpk`、`tenshi-vita.zip` 和 `tenshi-vita-source.zip`，版本通过包内版本号及 GitHub Release 标识。
+本仓库只包含 PSV 移植项目，源代码位于 `src/`，Windows 构建脚本位于 `tools/`。生成测试参考是可选的开发步骤，需要单独检出上面的原 Godot 项目并向工具提供其路径；安装游玩和构建 PSV 程序均不需要生成参考。发行文件名固定为 `tenshi-vita.vpk`、`tenshi-vita.zip` 和 `tenshi-vita-source.zip`，版本通过包内版本号及 GitHub Release 标识。
 
 已有 26 个界面、72 个输入事件与定向行为检查通过主机验证。当前仍有部分专用转场滤镜尚未还原，字体栅格化和雪花随机序列存在差异；真机视频出帧、完整音画同步、休眠和完整通关尚未验收。报告问题时请附版本、PSV / Vita3K 环境与 `ux0:/data/tenshi/runtime.log` 的相关文字日志。
 
 ## 许可与来源
 
-本项目原创代码使用 [MIT 许可](LICENSE)。字体为 Adobe 思源黑体简体常规字重，按 SIL OFL 1.1 分发。原始游戏剧本、图像、声音和片头不适用本项目 MIT 许可。第三方版权与对应源码资料保留在 `psv/licenses/`、`psv/third_party/` 和发行源码包中。
+本项目原创代码使用 [MIT 许可](LICENSE)。字体为 Adobe 思源黑体简体常规字重，按 SIL OFL 1.1 分发。原始游戏剧本、图像、声音和片头不适用本项目 MIT 许可。第三方版权与对应源码资料保留在 `licenses/`、`third_party/` 和发行源码包中。
 
-感谢原 Godot 项目与所引用的开源组件。硬解实现的技术来源及检查范围见 [视频实现记录](psv/VIDEO_LOGO_FIXES_0.22.md)。
+感谢原 Godot 项目与所引用的开源组件。硬解实现的技术来源及检查范围见 [视频实现记录](VIDEO_LOGO_FIXES_0.22.md)。
