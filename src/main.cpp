@@ -11,6 +11,7 @@
 #include <SDL_ttf.h>
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <cmath>
 #include <cstdio>
 #include <ctime>
@@ -164,6 +165,8 @@ static void fallback(SDL_Renderer *r, const std::string &s, int x, int y) {
     }
 }
 #include "archive_audio.hpp"
+#include "voice_decoder.hpp"
+#include "prefetched_audio.hpp"
 #include "movie.hpp"
 class App {
     Movie movie;
@@ -200,6 +203,9 @@ class App {
     std::unique_ptr<Runtime> vm;
     Texture title;
     Mix_Music *music = nullptr;
+    SDL_RWops *musicStream = nullptr; // Non-owning: Mix_FreeMusic closes it.
+    uint64_t musicUnderrunBytes = 0, musicIoErrors = 0;
+    uint32_t musicStatsAt = 0;
     Mix_Chunk *outgoingMusic = nullptr;
     int loadedMusicId = 0;
     bool musicLoops = true;
@@ -302,13 +308,13 @@ class App {
         revealed = 0;
         messageTimer = 0;
     }
-    // Voices are Ogg Vorbis. Decoding one clip with Mix_LoadWAV_RW takes ~0.1 s on the Vita, which
-    // froze the main loop at every voiced line, so clips are decoded on a worker thread and start
-    // playing from pollVoice() once ready. Only the latest request (voiceRequest) is ever played.
+    // Reading and Vorbis decoding both stay on the worker. SDL_mixer's Ogg loader holds
+    // the live audio lock during decoding, so decode directly to the cached mixer format.
+    // Only the latest request (voiceRequest) is ever played by the main thread.
     struct VoiceJob {
         unsigned id = 0;
         std::string name;
-        Bytes data;
+        const Archive *archive = nullptr; // App owns this until after the worker joins.
         Mix_Chunk *chunk = nullptr;
         std::string error;
         uint32_t ms = 0;
@@ -318,7 +324,10 @@ class App {
     SDL_cond *voiceWake = nullptr;
     std::vector<VoiceJob> voicePending, voiceDone;
     bool voiceQuit = false;
-    unsigned voiceSerial = 0, voiceRequest = 0;
+    unsigned voiceSerial = 0;
+    std::atomic<unsigned> voiceRequest{0};
+    int audioFrequency = 44100, audioChannels = 2;
+    SDL_AudioFormat audioFormat = AUDIO_S16SYS;
     static int voiceWorker(void *user) {
         auto &app = *static_cast<App *>(user);
         SDL_LockMutex(app.voiceMutex);
@@ -332,15 +341,19 @@ class App {
             SDL_UnlockMutex(app.voiceMutex);
             uint32_t started = SDL_GetTicks();
             try {
-                auto ogg = repairedVoice(job.data);
-                job.chunk = Mix_LoadWAV_RW(SDL_RWFromConstMem(ogg.data(), int(ogg.size())), 1);
-                if (!job.chunk)
-                    job.error = Mix_GetError();
+                auto ogg = repairedVoice(job.archive->read(job.name));
+                job.chunk = decodeVoicePcm(ogg, app.audioFrequency, app.audioFormat, app.audioChannels);
             } catch (const std::exception &e) {
                 job.error = e.what();
             }
-            job.data = Bytes();
             job.ms = SDL_GetTicks() - started;
+            if (job.id != app.voiceRequest.load()) {
+                // Do not retain a cancelled long bonus clip during the next decode.
+                if (job.chunk)
+                    Mix_FreeChunk(job.chunk);
+                SDL_LockMutex(app.voiceMutex);
+                continue;
+            }
             SDL_LockMutex(app.voiceMutex);
             app.voiceDone.push_back(std::move(job));
         }
@@ -383,7 +396,8 @@ class App {
         stopVoice();
         if (!audio || name.empty())
             return;
-        auto bytes = asset("voice.a").read(name);
+        const Archive &voices = asset("voice.a");
+        voices.entry(name); // Validate cheaply; the worker performs the file I/O.
         if (!voiceMutex) {
             voiceMutex = SDL_CreateMutex();
             voiceWake = SDL_CreateCond();
@@ -402,7 +416,7 @@ class App {
         }
         voiceRequest = ++voiceSerial;
         SDL_LockMutex(voiceMutex);
-        voicePending.push_back({voiceRequest, name, std::move(bytes), nullptr, {}});
+        voicePending.push_back({voiceRequest, name, &voices, nullptr, {}});
         SDL_CondSignal(voiceWake);
         SDL_UnlockMutex(voiceMutex);
     }
@@ -473,6 +487,10 @@ class App {
             musicFade = {Mix_VolumeMusic(-1), 0, SDL_GetTicks(), uint32_t(std::max(1, fadeUnits) * 10)};
             return;
         }
+        // Prefill on the main thread while the old track continues. Once playing,
+        // SDL_mixer reads only cached PCM; it never seeks or reads the archive.
+        std::unique_ptr<SDL_RWops, decltype(&SDL_RWclose)> nextStream(
+            PrefetchedArchiveWave::open(asset("music.a"), number(id) + ".w"), SDL_RWclose);
         if (music && Mix_PlayingMusic()) {
             double position = Mix_GetMusicPosition(music);
             if (position < 0)
@@ -487,21 +505,41 @@ class App {
             }
         }
         Mix_HaltMusic();
+        if (outgoingMusic) {
+            overlapFade.start = SDL_GetTicks();
+            Mix_Volume(9, overlapFade.volume);
+            Mix_PlayChannel(9, outgoingMusic, 0);
+        }
+        musicStream = nullptr;
         if (music)
-            Mix_FreeMusic(music);
-        music = Mix_LoadMUS_RW(ArchiveWave::open(asset("music.a"), number(id) + ".w"), 1);
+            Mix_FreeMusic(music); // SDL_mixer unlocks audio before closing/joining the RW worker.
+        SDL_RWops *prepared = nextStream.release();
+        music = Mix_LoadMUS_RW(prepared, 1);
         if (!music)
             throw std::runtime_error(std::string("Music decode failed: ") + Mix_GetError());
+        musicStream = prepared;
+        musicUnderrunBytes = musicIoErrors = 0;
+        musicStatsAt = SDL_GetTicks();
         loadedMusicId = id;
         musicLoops = loop;
         Mix_VolumeMusic(preferences.at("master").get<int>() * preferences.at("music").get<int>() * 128 / 400);
         musicStartedAt = SDL_GetTicks();
-        if (outgoingMusic) {
-            overlapFade.start = musicStartedAt;
-            Mix_Volume(9, overlapFade.volume);
-            Mix_PlayChannel(9, outgoingMusic, 0);
-        }
         Mix_PlayMusic(music, loop ? -1 : 0);
+    }
+    void pollMusicStream() {
+        if (!musicStream || SDL_GetTicks() - musicStatsAt < 1000)
+            return;
+        musicStatsAt = SDL_GetTicks();
+        auto stats = PrefetchedArchiveWave::get(musicStream).stats();
+        if ((stats.underrunBytes != musicUnderrunBytes || stats.ioErrors != musicIoErrors) &&
+            perfLines < 80) {
+            fprintf(stderr, "Audio: music %03d cache underrun=%u B, read errors=%u, buffer=%u B\n",
+                    loadedMusicId, unsigned(stats.underrunBytes), unsigned(stats.ioErrors),
+                    unsigned(stats.bufferBytes));
+            ++perfLines;
+        }
+        musicUnderrunBytes = stats.underrunBytes;
+        musicIoErrors = stats.ioErrors;
     }
     // Loading a sound effect reads it from se.a and resamples 22.05 kHz to the 44.1 kHz mixer on the
     // main thread, so decoded chunks are kept (LRU, 16 MiB) and repeated effects start instantly.
@@ -1152,6 +1190,7 @@ class App {
         stopVoice();
         freeSoundCache();
         stopMusic();
+        musicStream = nullptr;
         if (music)
             Mix_FreeMusic(music);
         if (audio)
@@ -1204,6 +1243,7 @@ class App {
         Mix_Init(MIX_INIT_OGG);
         audio = Mix_OpenAudio(44100, AUDIO_S16SYS, 2, 2048) == 0;
         if (audio) {
+            Mix_QuerySpec(&audioFrequency, &audioFormat, &audioChannels);
             Mix_AllocateChannels(10);
             Mix_Volume(-1, volume);
             Mix_VolumeMusic(volume);
@@ -1421,6 +1461,7 @@ class App {
             try {
                 heldSkip = (SDL_GetModState() & KMOD_CTRL) != 0;
                 pollVoice();
+                pollMusicStream();
                 tickPresentation();
                 if (smoke && testMode == 0 && ++frames % 2 == 0) {
                     if (ending) {
@@ -1519,7 +1560,7 @@ int main(int argc, char **argv) {
     if (!logFile)
         return 1;
     std::setvbuf(stderr, nullptr, _IONBF, 0);
-    fprintf(stderr, "Tenshi Vita 0.26: log directory result=0x%x\n", unsigned(logDirStatus));
+    fprintf(stderr, "Tenshi Vita 0.27: log directory result=0x%x\n", unsigned(logDirStatus));
     const std::string root = "ux0:/data/tenshi";
     const std::string stateRoot = root;
     int smoke = 0, testMode = 0;

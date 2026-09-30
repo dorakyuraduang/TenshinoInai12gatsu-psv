@@ -26,7 +26,7 @@ if(TENSHI_VITA)
     get_filename_component(notice_name "${notice}" NAME)
     list(APPEND notice_args FILE "${notice}" "licenses/${notice_name}")
   endforeach()
-  vita_create_vpk(tenshi-vita.vpk "TNSH00001" eboot.bin VERSION "00.26" NAME "Tenshi Vita"
+  vita_create_vpk(tenshi-vita.vpk "TNSH00001" eboot.bin VERSION "00.27" NAME "Tenshi Vita"
     ${notice_args}
     FILE "${CMAKE_CURRENT_SOURCE_DIR}/assets/SourceHanSansCN-Regular.otf" "assets/SourceHanSansCN-Regular.otf"
     FILE "${CMAKE_CURRENT_SOURCE_DIR}/assets/source-han-sans.json" "assets/source-han-sans.json"
@@ -39,18 +39,21 @@ if(TENSHI_VITA)
     FILE "${CMAKE_CURRENT_SOURCE_DIR}/THIRD_PARTY_NOTICES.md" "THIRD_PARTY_NOTICES.md")
 else()
   find_package(PkgConfig REQUIRED)
-  pkg_check_modules(SDL REQUIRED IMPORTED_TARGET sdl2 SDL2_image SDL2_ttf SDL2_mixer)
+  pkg_check_modules(SDL REQUIRED IMPORTED_TARGET sdl2 SDL2_image SDL2_ttf SDL2_mixer vorbisfile)
   target_link_libraries(tenshi PRIVATE PkgConfig::SDL)
   add_custom_command(TARGET tenshi POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:tenshi>/assets"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
       "${CMAKE_CURRENT_SOURCE_DIR}/assets/SourceHanSansCN-Regular.otf"
       "$<TARGET_FILE_DIR:tenshi>/assets/SourceHanSansCN-Regular.otf")
-  foreach(test IN ITEMS runtime_test coverage_test media_test archive_audio_test presentation_test replay_test snapshot_test startup_test message_bytes_test logo_test movie_vita_test movie_index_test)
+  foreach(test IN ITEMS runtime_test coverage_test media_test archive_audio_test voice_decoder_test prefetched_audio_test audio_loading_test presentation_test replay_test snapshot_test startup_test message_bytes_test logo_test movie_vita_test movie_index_test)
     add_executable(${test} tests/${test}.cpp)
     target_include_directories(${test} PRIVATE src)
   endforeach()
   target_link_libraries(archive_audio_test PRIVATE PkgConfig::SDL)
+  target_link_libraries(voice_decoder_test PRIVATE PkgConfig::SDL)
+  target_link_libraries(prefetched_audio_test PRIVATE PkgConfig::SDL)
+  target_link_libraries(audio_loading_test PRIVATE PkgConfig::SDL)
   target_link_libraries(snapshot_test PRIVATE PkgConfig::SDL)
   target_link_libraries(logo_test PRIVATE PkgConfig::SDL)
   target_link_libraries(movie_vita_test PRIVATE PkgConfig::SDL)

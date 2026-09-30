@@ -20,7 +20,7 @@ $compile+=@('-Wl,--end-group','-Wl,-q','-Wl,-z,nocopyreloc','-o',"$build/tenshi.
 Run-Tool 'arm-vita-eabi-g++' $compile
 Run-Tool 'vita-elf-create' @('-s',"$build/tenshi.elf","$build/tenshi.velf")
 Run-Tool 'vita-make-fself' @('-s','-c',"$build/tenshi.velf","$build/eboot.bin")
-Run-Tool 'vita-mksfoex' @('-s','TITLE_ID=TNSH00001','-s','APP_VER=00.26','Tenshi Vita',"$build/param.sfo")
+Run-Tool 'vita-mksfoex' @('-s','TITLE_ID=TNSH00001','-s','APP_VER=00.27','Tenshi Vita',"$build/param.sfo")
 $pack=@('-s',"$build/param.sfo",'-b',"$build/eboot.bin",'-a',"$root/LICENSE=LICENSE",'-a',"$root/THIRD_PARTY_NOTICES.md=THIRD_PARTY_NOTICES.md")
 if(Test-Path "$root/sce_sys/icon0.png"){$pack+=@('-a',"$root/sce_sys/icon0.png=sce_sys/icon0.png")}
 foreach($license in Get-ChildItem "$root/licenses" -File){$pack+=@('-a',($license.FullName+'=licenses/'+$license.Name))}

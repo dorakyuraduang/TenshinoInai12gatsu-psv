@@ -2,12 +2,14 @@
 
 《天使不在的十二月》的 PlayStation Vita 移植项目，基于 [Godot / C# 重制项目](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot) 编写独立 C++ / SDL2 运行时。PSV 上直接运行 VPK，无需安装 Godot 或 .NET。
 
-当前发布 **0.26 测试版**，应用 ID 为 `TNSH00001`。包含原始资源直读、中文对白、存读档、设置、CG / 音乐鉴赏、触摸操作及内置思源黑体；安装包内置 H.264 / AAC 片头。Logo 约 60 帧已有实机日志，当前片头硬解、完整流程及 Vita3K 兼容性仍需设备复验。
+当前发布 **0.27 测试版**，应用 ID 为 `TNSH00001`。包含原始资源直读、中文对白、存读档、设置、CG / 音乐鉴赏、触摸操作及内置思源黑体；安装包内置 H.264 / AAC 片头。Logo 约 60 帧已有实机日志，当前片头硬解、完整流程及 Vita3K 兼容性仍需设备复验。
+
+0.27 针对切图与资源加载时的 BGM 卡顿、爆音调整了音频加载：语音在后台独立解码，音乐采用后台预读缓存，切换曲目时在新曲预填期间继续旧曲，再接续切换。本轮以主机数值检查与 VitaSDK 原生编译为验证范围，实机听感仍待复验；详见 [移植说明](PORTING.md#027-音频加载与预读)和 [验证记录](VALIDATION.md)。
 
 ## 下载与安装
 
-- [下载固定名称安装包 tenshi-vita.vpk](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/download/v0.26/tenshi-vita.vpk)
-- [查看全部发布文件及版本说明](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.26)
+- [下载固定名称安装包 tenshi-vita.vpk](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/download/v0.27/tenshi-vita.vpk)
+- [查看全部发布文件及版本说明](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.27)
 - **[完整安装、操作、存档与排错说明](INSTALL.md)**
 
 在可以安装自制软件的 PSV 上，用 VitaShell 安装 `tenshi-vita.vpk`。然后把自己持有的对应 GB18030 资源版的下列文件原样复制到 `ux0:/data/tenshi/`，无需解包：

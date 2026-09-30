@@ -54,7 +54,7 @@ with zipfile.ZipFile(dist/'tenshi-vita.vpk') as z:
     icon_chunks=dict(png_chunks(icon))
     if icon[:8]!=b'\x89PNG\r\n\x1a\n' or icon_chunks.get(b'IHDR',b'')[:10]!=(128).to_bytes(4,'big')*2+bytes([8,3]) or b'tRNS' in icon_chunks:raise RuntimeError('icon0.png must be a 128x128 8-bit indexed PNG without alpha')
     if z.read('eboot.bin')[:4]!=b'SCE\x00':raise RuntimeError('Not a Vita SELF executable')
-    if b'00.26\x00' not in z.read('sce_sys/param.sfo'):raise RuntimeError('Wrong VPK version')
+    if b'00.27\x00' not in z.read('sce_sys/param.sfo'):raise RuntimeError('Wrong VPK version')
     if z.read(index_entry) != (psv/index_entry).read_bytes():raise RuntimeError('Bundled packet index mismatch')
     if z.read(video_entry) != (psv/video_entry).read_bytes():raise RuntimeError('Bundled opening mismatch')
     if z.read(font_entry) != (psv/font_entry).read_bytes():raise RuntimeError('Bundled font mismatch')

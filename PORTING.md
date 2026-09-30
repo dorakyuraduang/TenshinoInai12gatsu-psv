@@ -1,14 +1,14 @@
 # Tenshi Vita · 原始资源直读版
 
-基于[Godot / C# 游戏](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot)移植的独立 C++ / SDL2 PSV 版本，PSV 上无需 Godot 或 .NET。当前为 **0.26 测试版**：按用户要求内置 H.264/AAC 片头，接入 SceVideodec/SceAudiodec 直接硬解；Logo 改为 GPU 合成。实机日志已确认 Logo 稳定在约 60 帧；新片头硬解路径仍需实机复验。保留 0.17 的行为差异修复、内置思源黑体及项目图标。
+基于[Godot / C# 游戏](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot)移植的独立 C++ / SDL2 PSV 版本，PSV 上无需 Godot 或 .NET。当前为 **0.27 测试版**：按用户要求内置 H.264/AAC 片头，接入 SceVideodec/SceAudiodec 直接硬解；Logo 改为 GPU 合成。实机日志已确认 Logo 稳定在约 60 帧；新片头硬解路径仍需实机复验。保留 0.17 的行为差异修复、内置思源黑体及项目图标。
 
 ## 安装
 
-玩家完整安装与操作步骤见 [INSTALL.md](INSTALL.md)。GitHub 发布页见 [Tenshi Vita Releases](https://github.com/dorakyuraduang/TenshinoInai12gatsu-releases/tag/v0.26)。
+玩家完整安装与操作步骤见 [INSTALL.md](INSTALL.md)。GitHub 发布页见 [Tenshi Vita Releases](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.27)。
 
-安装包固定为 `dist/tenshi-vita.vpk`，后续构建直接更新同名文件，不再额外生成带版本号的 VPK。当前包内版本为 `00.26`，升级时内部版本号仍正常更新。
+安装包固定为 `dist/tenshi-vita.vpk`，后续构建直接更新同名文件，不再额外生成带版本号的 VPK。当前包内版本为 `00.27`，升级时内部版本号仍正常更新。
 
-1. 安装 `dist/tenshi-vita.vpk`，应用 ID `TNSH00001`，版本 `00.26`。
+1. 安装 `dist/tenshi-vita.vpk`，应用 ID `TNSH00001`，版本 `00.27`。
 2. 将下列原始资源放到 `ux0:/data/tenshi/`，无需解包。片头和中文字体已内置，不必再放 `openning.v` 或 `font.ttf`。
 
 ```text
@@ -24,6 +24,14 @@ ux0:/data/tenshi/
 ```
 
 在 Windows Vita3K 中，这对应其配置 `pref-path` 下的 `ux0/data/tenshi/`，不是 `ux0/app/TNSH00001/`。VPK 包含程序、图标、OFL 思源黑体、许可及用户要求内置的片头；其余原始游戏资源自行提供。此版本验证的是本项目使用的 GB18030 资源版本。
+
+## 0.27 音频加载与预读
+
+针对实机切图、加载资源时的 BGM 卡顿与爆音，语音改由独立的 `libvorbisfile` 路径在后台线程读盘、修复归档 Ogg 并解码为 PCM，再交给 SDL_mixer 播放，不再使用 SDL_mixer 加载 Ogg 时持有的全段音频锁。
+
+音乐由后台线程预读：第一页常驻，另有两页滚动缓存和一页 staging 缓冲，共 4 MiB。音频回调只从缓存复制数据，不直接读盘；慢盘缺页和读取错误会在 `ux0:/data/tenshi/runtime.log` 中记录 `Audio: music ... cache underrun`、`read errors` 及缓冲大小。新曲预填期间旧曲继续播放，随后抓取旧曲的 0.3 秒片段进行接续。
+
+本轮以主机数值检查与 VitaSDK 原生编译为验证范围，实机听感、慢盘表现与完整游玩仍待复验。具体结果见 [VALIDATION.md](VALIDATION.md)。本轮没有改变片头视频的设备验收边界；0.26 的确认文字和此前 UI 修复继续包含。
 
 ## 0.26 覆盖存档确认文字
 
@@ -160,6 +168,8 @@ cmake --build build-vita-cmake
 ```
 
 ## 开发验证
+
+主机 CMake 构建需要 SDL2、SDL2_image、SDL2_ttf、SDL2_mixer 与 `vorbisfile` 的开发库和 pkg-config 信息。音频验证目标包括 `voice_decoder_test`、`prefetched_audio_test` 和 `audio_loading_test`，分别检查语音解码、音乐预读及资源加载期间的音频行为；它们属于主机验证，不能代替设备试听。
 
 `prepare/` 和参考导出工具只用于开发验证。运行 PSV 和构建 VPK 不需要 Godot 源码。若要重新生成与 Godot 对照的参考数据，先另外检出 [Godot 项目](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot)，然后通过 `GodotProjectRoot` 或 `--godot-root` 指定它的位置；该项目不随 PSV 仓库发布。先生成剧情参考，再独立运行媒体和回想导出：
 

@@ -1,10 +1,12 @@
 # 安装与游玩说明
 
-Tenshi Vita 是从 [Godot / C# 重制项目](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot) 移植的独立 PSV 程序。本仓库只包含 PSV 移植项目，PSV 上不需要安装 Godot 或 .NET。安装包固定名为 **`tenshi-vita.vpk`**，应用 ID 为 `TNSH00001`；当前内部版本为 `00.26`。
+Tenshi Vita 是从 [Godot / C# 重制项目](https://github.com/dorakyuraduang/TenshinoInai12gatsu-godot) 移植的独立 PSV 程序。本仓库只包含 PSV 移植项目，PSV 上不需要安装 Godot 或 .NET。安装包固定名为 **`tenshi-vita.vpk`**，应用 ID 为 `TNSH00001`；当前内部版本为 `00.27`。
 
-下载：[0.26 测试版发布页](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.26) · [tenshi-vita.vpk](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/download/v0.26/tenshi-vita.vpk)。
+下载：[0.27 测试版发布页](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/tag/v0.27) · [tenshi-vita.vpk](https://github.com/dorakyuraduang/TenshinoInai12gatsu-psv/releases/download/v0.27/tenshi-vita.vpk)。
 
 **这是测试版。** Logo 的约 60 帧表现已得到用户真机日志确认，但当前 H.264/AAC 片头硬解修复尚未完成真机全片复验，音画同步、触摸、系统输入法和休眠恢复也仍需设备验证。Vita3K 可以用于尝试安装与排查，不保证本项目或片头硬解能在模拟器正常运行。测试范围见 [验证记录](VALIDATION.md)。
+
+0.27 调整了语音后台解码和音乐预读，用于处理切图、加载资源时的 BGM 卡顿与爆音；该轮音频修改仍待实机复验，设备检查范围见 [验证记录](VALIDATION.md)。安装目录、资源需求和存档流程沿用此前版本。
 
 ## 先准备什么
 
@@ -28,7 +30,7 @@ ux0:/data/tenshi/
 
 八个文件都应直接位于 `tenshi` 目录下，避免多套一层游戏目录或 `data` 目录。请按上面的文件名保存。
 
-当前 0.26 VPK 已内置思源黑体及其 SIL OFL 1.1 许可，并内置 H.264/AAC 片头及播放索引。**不需要另放 `font.ttf`、`openning.v` 或视频解码插件。** 旧 `font.ttf` 不会覆盖内置默认字体。字体授权见 [FONT_LICENSE.md](FONT_LICENSE.md)；原游戏的归档和片头不因程序源码的许可而获得再分发授权。
+当前 0.27 VPK 已内置思源黑体及其 SIL OFL 1.1 许可，并内置 H.264/AAC 片头及播放索引。**不需要另放 `font.ttf`、`openning.v` 或视频解码插件。** 旧 `font.ttf` 不会覆盖内置默认字体。字体授权见 [FONT_LICENSE.md](FONT_LICENSE.md)；原游戏的归档和片头不因程序源码的许可而获得再分发授权。
 
 ## PS Vita 真机安装
 
@@ -123,6 +125,7 @@ PSV 存档格式与 Godot 版不互通；读取时也会检查剧情归档指纹
 | 重启又播放 Logo / 片头 | 这是正常启动流程。要续玩，在标题“继续”中手动读取存档。首次序章没完成且未保存时会从头开始。 |
 | `Save belongs to different game resources` | 当前剧情归档与该存档使用的资源不一致。保留存档和备份，恢复原来同一版 `tenshi_dvd.a` 后再读档。 |
 | `Cannot write` / `Cannot back up` / `Cannot commit` | 检查存储空间、数据目录可写性及存储卡状态；先备份已有存档和 `.bak`，不要清空数据目录。 |
+| 切图或加载时 BGM 卡顿、爆音 | 0.27 已调整音频读盘与解码，仍需设备复验。检查 `runtime.log` 中的 `Audio: music ... cache underrun` 和 `read errors`，保留对应曲目、场景、存储设备及复现步骤。 |
 | Logo 后视频黑屏、`HW ... failed` 或 C2-12828-1 | 当前片头硬解仍待真机复验。请提供包内版本、设备或 Vita3K 版本，以及下面的日志。只在视频正在播放时，×／○／START 可请求跳过；初始化错误不能据此视为播放已修复。 |
 | 点击屏幕无反应 | 真机使用前触摸屏，避开黑边；方向键与 × 可操作菜单。Vita3K 需核对其触摸映射。若按键也无反应，记录发生界面并附日志。 |
 
