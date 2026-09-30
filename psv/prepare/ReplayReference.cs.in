@@ -1,0 +1,5 @@
+using System.Text.Json;using Tenshi;
+static class ReplayReference {
+public static void Export(string root,string output){var archive=new Archive(Path.Combine(root,"tenshi_dvd.a"));var code=ScenarioScript.Read(archive,"_omakeMenu.p").Code;int sw=Array.IndexOf(code,(ushort)0x7753,4124),table=code[sw+1],count=code[table+1];var traces=new List<object>();
+for(int i=0;i<count;i++){int target=code[table+2+i*2],index=code[table+3+i*2];if(target==0)continue;if(code[target]!=0x6143)throw new Exception("Replay call invalid");var vm=new ScenarioRuntime(archive,code[target+1]){Replay=true};var events=new List<SceneEvent>();for(int guard=0;guard<100000;guard++){var e=vm.Next();if(e==null)break;events.Add(e);if(e.Kind==SceneEventKind.Choice)vm.Choose(1);}if(!vm.Finished)throw new Exception("Replay did not finish");traces.Add(new{index,events});}
+File.WriteAllText(Path.Combine(output,"replays.json"),JsonSerializer.Serialize(traces,new JsonSerializerOptions{PropertyNamingPolicy=JsonNamingPolicy.CamelCase}));Console.WriteLine($"Replay reference: {traces.Count} entrypoints");}}

@@ -1,0 +1,43 @@
+using System.Text.Json;
+using Tenshi;
+using Godot;
+static class MediaReference
+{
+    static ulong Hash(byte[] data) { ulong h=14695981039346656037; foreach(byte b in data) h=unchecked((h^b)*1099511628211); return h; }
+    public static void Export(string root,string output)
+    {
+        var rows=new List<object>();
+        foreach(string file in new[]{"egbg.a","char.a","sys.a","ed.a","music.a","se.a","voice.a"}) {
+            var a=new Archive(Path.Combine(root,file)); int count=0;
+            foreach(string name in a.Names.OrderBy(x=>x,StringComparer.Ordinal)) {
+
+                string[] uiNames=["title.px","common.px","system.px","saveload.px","cursor.px","snow.px","omake.px","memoirs.px","inputName.px","leaflogo.px","thumbnail0.px","thumbnail1.px","thumbnail2.px","thumbnail3.px","thumbnail4.px"];
+                bool mask=name.StartsWith("wipe",StringComparison.OrdinalIgnoreCase)||name.StartsWith("wave",StringComparison.OrdinalIgnoreCase);
+                if(file=="sys.a" && !mask&&!uiNames.Contains(name,StringComparer.OrdinalIgnoreCase))continue;
+                var (bytes,kind)=a.Read(name);
+                if(name.EndsWith(".px",StringComparison.OrdinalIgnoreCase)) {
+                    void Add(Image image,int frame,int x=0,int y=0) {
+                        byte[] pixels=image.Pixels;
+                        if(image.PixelFormat==Image.Format.L8) pixels=pixels.SelectMany(v=>new byte[]{v,v,v,255}).ToArray();
+                        rows.Add(new{file,name,frame,w=image.Width,h=image.Height,x,y,hash=Hash(pixels)});
+                    }
+                    if(file=="sys.a"&&mask) Add(PxDecoder.DecodeBackground(bytes,kind),-2);
+                    else if(file=="egbg.a") Add(PxDecoder.DecodeBackground(bytes,kind),-1);
+                    else if(file=="char.a") { var p=UiPxDecoder.DecodeCharacter(bytes);Add(p.Image,-1,p.Origin.X,p.Origin.Y); }
+                    else {
+                        var unpacked=PxDecoder.DecodeLzss(bytes);
+                        if(BitConverter.ToUInt32(unpacked,16)==0x80) {
+                            for(int i=0;i<UiPxDecoder.FrameCount(bytes);i++){var p=UiPxDecoder.DecodeFrames(bytes,i)[0];Add(p.Image,i,p.Origin.X,p.Origin.Y);}
+                        } else Add(UiPxDecoder.DecodeStandalone(bytes),-1,BitConverter.ToInt32(unpacked,8),BitConverter.ToInt32(unpacked,12));
+                    }
+                } else if(name.EndsWith(".w")) { var w=AudioDecoder.Decode(bytes);rows.Add(new{file,name,hash=Hash(w.Data),size=w.Data.Length}); }
+                else if(name.EndsWith(".g")) rows.Add(new{file,name,hash=Hash(VoiceDecoder.Decode(bytes).Data)});
+                count++;
+            }
+            Console.WriteLine($"Media reference: {file}, {count} entries");
+        }
+        File.WriteAllText(Path.Combine(output,"media.json"),JsonSerializer.Serialize(rows));
+    }
+}
+
+

@@ -1,0 +1,57 @@
+// Minimal data adapters for the existing decoders. No Godot runtime is used.
+using System.Buffers.Binary;
+using System.IO.Compression;
+using System.Text;
+namespace Godot;
+public readonly record struct Vector2I(int X, int Y);
+public sealed class Image : IDisposable
+{
+    public enum Format { Rgba8, L8 }
+    public int Width, Height; public byte[] Pixels = []; public Format PixelFormat;
+    public static Image CreateFromData(int w, int h, bool mipmaps, Format f, byte[] pixels)
+        => new() { Width=w, Height=h, PixelFormat=f, Pixels=pixels };
+    public void Dispose() { }
+    public void SavePng(string path)
+    {
+        using var file=File.Create(path);
+        file.Write(new byte[]{137,80,78,71,13,10,26,10});
+        byte[] header=new byte[13];
+        BinaryPrimitives.WriteInt32BigEndian(header,Width);
+        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(4),Height);
+        header[8]=8; header[9]=PixelFormat==Format.Rgba8 ? (byte)6 : (byte)0;
+        Chunk(file,"IHDR",header);
+        using var compressed=new MemoryStream();
+        using(var z=new ZLibStream(compressed,CompressionLevel.Fastest,true))
+        {
+            int stride=Width*(PixelFormat==Format.Rgba8?4:1);
+            for(int y=0;y<Height;y++) { z.WriteByte(0); z.Write(Pixels,y*stride,stride); }
+        }
+        Chunk(file,"IDAT",compressed.ToArray()); Chunk(file,"IEND",[]);
+    }
+    static void Chunk(Stream s,string name,byte[] bytes)
+    {
+        byte[] n=Encoding.ASCII.GetBytes(name), length=new byte[4];
+        BinaryPrimitives.WriteInt32BigEndian(length,bytes.Length); s.Write(length); s.Write(n); s.Write(bytes);
+        uint crc=0xffffffff;
+        foreach(byte b in n.Concat(bytes)) { crc^=b; for(int i=0;i<8;i++) crc=(crc>>1)^((crc&1)!=0?0xedb88320u:0); }
+        BinaryPrimitives.WriteUInt32BigEndian(length,crc^0xffffffff); s.Write(length);
+    }
+}
+public sealed class AudioStreamWav
+{
+    public enum FormatEnum { Format8Bits, Format16Bits }
+    public int MixRate; public bool Stereo; public FormatEnum Format; public byte[] Data=[];
+    public void Save(string path)
+    {
+        using var w=new BinaryWriter(File.Create(path));
+        short channels=(short)(Stereo?2:1), bits=(short)(Format==FormatEnum.Format16Bits?16:8);
+        w.Write("RIFF"u8); w.Write(36+Data.Length); w.Write("WAVEfmt "u8); w.Write(16);
+        w.Write((short)1); w.Write(channels); w.Write(MixRate); w.Write(MixRate*channels*bits/8);
+        w.Write((short)(channels*bits/8)); w.Write(bits); w.Write("data"u8); w.Write(Data.Length); w.Write(Data);
+    }
+}
+public sealed class AudioStreamOggVorbis
+{
+    public byte[] Data=[];
+    public static AudioStreamOggVorbis LoadFromBuffer(byte[] bytes)=>new(){Data=bytes};
+}

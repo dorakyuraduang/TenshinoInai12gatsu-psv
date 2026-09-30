@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- .cs.in keeps the independent converter out of the parent Godot build. -->
+    <Compile Include="*.cs.in" />
+    <Compile Include="../../Scripts/Archive.cs" />
+    <Compile Include="../../Scripts/ScenarioScript.cs" />
+    <Compile Include="../../Scripts/ScenarioRuntime.cs" />
+    <Compile Include="../../Scripts/PxDecoder.cs" />
+    <Compile Include="../../Scripts/UiPxDecoder.cs" />
+    <Compile Include="../../Scripts/AudioDecoder.cs" />
+    <Compile Include="../../Scripts/VoiceDecoder.cs" />
+  </ItemGroup>
+</Project>

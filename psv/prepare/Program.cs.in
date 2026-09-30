@@ -1,0 +1,33 @@
+using System.Text.Json;
+using Tenshi;
+static class Program
+{
+    static readonly JsonSerializerOptions Options = new(){PropertyNamingPolicy=JsonNamingPolicy.CamelCase};
+    static int Main(string[] args)
+    {
+        try {
+            if(args.Length!=2) throw new ArgumentException("Usage: Reference <original-resources> <new-test-output>");
+            string output=Path.GetFullPath(args[1]);
+            if(Environment.GetEnvironmentVariable("TENSHI_REPLAY_REFERENCE")=="1"){Directory.CreateDirectory(output);ReplayReference.Export(args[0],output);return 0;}
+            if(Environment.GetEnvironmentVariable("TENSHI_MEDIA_REFERENCE")=="1"){Directory.CreateDirectory(output);MediaReference.Export(args[0],output);return 0;}
+            if(Directory.Exists(output)&&Directory.EnumerateFileSystemEntries(output).Any()) throw new IOException("Test output must be empty");
+            Directory.CreateDirectory(output);
+            var archive=new Archive(Path.Combine(args[0],"tenshi_dvd.a"));
+            var prologue=new List<SceneEvent>();
+            foreach(string name in new[]{"com_0100.p","com_0110.p","com_0120.p"}) prologue.AddRange(ScenarioScript.Read(archive,name).ReadLinearScene());
+            for(int policy=1;policy<=3;policy++) {
+                var vm=new ScenarioRuntime(archive);var events=new List<SceneEvent>(prologue);var decisions=new List<int>();
+                for(int guard=0;guard<200000;guard++) {
+                    var e=vm.Next();if(e==null)break;events.Add(e);
+                    if(e.Kind==SceneEventKind.Choice){int choice=Math.Min(policy,e.Options!.Length);decisions.Add(choice);vm.Choose(choice);}
+                }
+                if(!vm.Finished)throw new Exception("Reference trace incomplete");
+                File.WriteAllText(Path.Combine(output,$"trace{policy}.json"),JsonSerializer.Serialize(new{events,decisions},Options));
+                Console.WriteLine($"Policy {policy}: {events.Count} events");
+            }
+            TraceGraph.Export(archive,prologue,output,Options);
+            return 0;
+        } catch(Exception e){Console.Error.WriteLine(e.Message);return 1;}
+    }
+}
+

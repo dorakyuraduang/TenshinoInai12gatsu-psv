@@ -1,0 +1,127 @@
+{
+  "baseline": "PSV 0.15",
+  "checks": [
+    {
+      "actual": 4,
+      "different": true,
+      "godotExpected": 5,
+      "id": "default-text-speed"
+    },
+    {
+      "actual": 4,
+      "different": true,
+      "godotExpected": 5,
+      "id": "default-auto-speed"
+    },
+    {
+      "actual": 15,
+      "different": true,
+      "godotExpected": 20,
+      "id": "default-master-volume-steps"
+    },
+    {
+      "actual": "music",
+      "different": true,
+      "godotExpected": "memoirs",
+      "id": "memoirs-button-target"
+    },
+    {
+      "actual": "memoirs",
+      "different": true,
+      "godotExpected": "music",
+      "id": "music-button-target"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "auto-survives-settings"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "skip-survives-settings"
+    },
+    {
+      "actual": 1,
+      "different": true,
+      "godotExpected": 20,
+      "id": "slider-drag-to-end"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "read-mark-two-clicks-one-frame"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "history-forward-past-last-closes"
+    },
+    {
+      "actual": "",
+      "different": true,
+      "godotExpected": "audit.p:3",
+      "id": "load-restores-message-key"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "load-recomputes-read-status"
+    },
+    {
+      "actual": 396.0,
+      "different": true,
+      "godotExpected": 0.0,
+      "id": "load-starts-page-reveal-at-zero"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "continue-voice-on-unvoiced-line"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "skip-mode-does-not-start-voice"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "music-stop-keeps-playing-during-fade"
+    },
+    {
+      "actual": 0,
+      "different": true,
+      "godotExpected": 255,
+      "id": "hide-window-clears-speaker"
+    },
+    {
+      "actual": false,
+      "different": true,
+      "godotExpected": true,
+      "id": "ctrl-can-skip-unread"
+    },
+    {
+      "actual": true,
+      "different": false,
+      "godotExpected": true,
+      "id": "enter-choice-stops-voice"
+    },
+    {
+      "actual": true,
+      "different": true,
+      "godotExpected": false,
+      "id": "enter-choice-clears-skip"
+    }
+  ],
+  "different": 19,
+  "total": 20
+}

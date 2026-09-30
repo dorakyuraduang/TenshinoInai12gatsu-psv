@@ -1,0 +1,21 @@
+{
+  "FreeType-FTL.txt": "https://raw.githubusercontent.com/freetype/freetype/master/docs/FTL.TXT",
+  "HarfBuzz-COPYING.txt": "https://raw.githubusercontent.com/harfbuzz/harfbuzz/main/COPYING",
+  "libpng-LICENSE.txt": "https://raw.githubusercontent.com/pnggroup/libpng/libpng16/LICENSE",
+  "zlib-LICENSE.txt": "https://raw.githubusercontent.com/madler/zlib/v1.3.1/LICENSE",
+  "libjpeg-turbo-LICENSE.md": "https://raw.githubusercontent.com/libjpeg-turbo/libjpeg-turbo/main/LICENSE.md",
+  "libjpeg-turbo-README.ijg": "https://raw.githubusercontent.com/libjpeg-turbo/libjpeg-turbo/main/README.ijg",
+  "libwebp-COPYING.txt": "https://raw.githubusercontent.com/webmproject/libwebp/main/COPYING",
+  "libwebp-PATENTS.txt": "https://raw.githubusercontent.com/webmproject/libwebp/main/PATENTS",
+  "libogg-COPYING.txt": "https://raw.githubusercontent.com/xiph/ogg/master/COPYING",
+  "libvorbis-COPYING.txt": "https://raw.githubusercontent.com/xiph/vorbis/master/COPYING",
+  "opus-COPYING.txt": "https://raw.githubusercontent.com/xiph/opus/main/COPYING",
+  "opusfile-COPYING.txt": "https://raw.githubusercontent.com/xiph/opusfile/master/COPYING",
+  "libmodplug-COPYING.txt": "https://raw.githubusercontent.com/Konstanty/libmodplug/d1b97ed0020bc620a059d3675d1854b40bd2608d/COPYING",
+  "libxmp-COPYING.txt": "https://raw.githubusercontent.com/libxmp/libxmp/master/docs/COPYING",
+  "bzip2-LICENSE.txt": "https://raw.githubusercontent.com/libarchive/bzip2/bzip2-1.0.8/LICENSE",
+  "pthread-embedded-COPYING.txt": "https://raw.githubusercontent.com/vitasdk/pthread-embedded/master/COPYING",
+  "pl_mpeg-MIT.txt": "https://github.com/phoboslab/pl_mpeg/blob/master/pl_mpeg.h",
+  "pthread-LGPL-2.1.txt": "https://raw.githubusercontent.com/vitasdk/pthread-embedded/63e1cd9152082d9ccb1b38d67a4caf975562fbeb/COPYING.LIB",
+  "SourceHanSans-OFL.txt": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2/LICENSE.txt"
+}

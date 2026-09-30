@@ -1,0 +1,16 @@
+build*/
+data/
+dist/
+.tools/
+prepare/bin/
+prepare/obj/
+*.vpk
+*.self
+*.elf
+data*/
+recovery/
+*.velf
+__pycache__/
+*.pyc
+assets/opening.mp4
+assets/opening.idx

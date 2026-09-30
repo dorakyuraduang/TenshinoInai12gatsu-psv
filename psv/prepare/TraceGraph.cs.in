@@ -1,0 +1,29 @@
+using System.Text.Json;
+using Tenshi;
+static class TraceGraph
+{
+    public static void Export(Archive archive,IReadOnlyList<SceneEvent> prologue,string output,JsonSerializerOptions options)
+    {
+        string directory=Path.Combine(output,"coverage");Directory.CreateDirectory(directory);
+        var queue=new Queue<(int Id,ScenarioRuntime Vm)>();queue.Enqueue((0,new ScenarioRuntime(archive)));
+        var seen=new HashSet<string>();var endings=new SortedSet<int>();int ids=1,total=0,complete=0;
+        while(queue.Count>0)
+        {
+            var (id,vm)=queue.Dequeue();var events=new List<SceneEvent>();if(id==0)events.AddRange(prologue);
+            var children=new List<int>();
+            while(vm.Next() is {} e)
+            {
+                events.Add(e);if(++total>1000000)throw new InvalidDataException("Coverage limit exceeded");
+                if(e.Kind==SceneEventKind.Ending)endings.Add(e.Value);
+                if(e.Kind==SceneEventKind.Choice&&seen.Add(vm.StateKey))
+                {
+                    for(int i=1;i<=e.Options!.Length;i++){var child=vm.Fork();child.Choose(i);children.Add(ids);queue.Enqueue((ids++,child));}
+                }
+            }
+            if(vm.Finished)complete++;
+            File.WriteAllText(Path.Combine(directory,id+".json"),JsonSerializer.Serialize(new{events,children,finished=vm.Finished},options));
+        }
+        File.WriteAllText(Path.Combine(directory,"index.json"),JsonSerializer.Serialize(new{segments=ids,events=total,completedPaths=complete,endings},options));
+        Console.WriteLine($"Coverage: {ids} segments, {total} events, {complete} completed paths, endings {string.Join(',',endings)}");
+    }
+}

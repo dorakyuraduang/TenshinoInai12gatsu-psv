@@ -1,0 +1,111 @@
+{
+  "sdk": {
+    "url": "https://github.com/vitasdk/autobuilds/releases/download/master-win-v2.540/vitasdk-x86_64-w64-mingw32-2026-05-24_12-05-17.tar.bz2",
+    "sha256": "dc2b8a5fb72e162e9ebc3890897d4ab57ab8ed0aff729a6aca6fe94079155b0e"
+  },
+  "packages": [
+    {
+      "name": "bzip2",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/bzip2.tar.xz",
+      "sha256": "119c2cee26c1554dae4b8b61ddfa0f8e1a2456231154481ad34935f3de267973"
+    },
+    {
+      "name": "freetype",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/freetype.tar.xz",
+      "sha256": "ad918e4075822109a61b9a19609ec0524d9b0fdc1878e5b74fc5c8cbc443f763"
+    },
+    {
+      "name": "harfbuzz",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/harfbuzz.tar.xz",
+      "sha256": "74a56322cad6ddba06aef79369bca6db689dc3d7f842f52bd74d32e0db8f2c98"
+    },
+    {
+      "name": "libjpeg-turbo",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libjpeg-turbo.tar.xz",
+      "sha256": "87511c384b36f944655e298140f24215f3da8b59821deddca0f6a9c5e3438b78"
+    },
+    {
+      "name": "libmodplug",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libmodplug.tar.xz",
+      "sha256": "f163bdc79b665a9eaab5fe4957098fa228ee0d41f6c6a36b7b7c5eda17e3e5cf"
+    },
+    {
+      "name": "libogg",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libogg.tar.xz",
+      "sha256": "59299c36b20a3d6628afd3b3a2d35a49216192400343dd04c16fb5b068b64388"
+    },
+    {
+      "name": "libpng",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libpng.tar.xz",
+      "sha256": "e502fac413e17b75a06f8f2a88f87daec13d83a33e9206713a0612ee245b72b8"
+    },
+    {
+      "name": "libvorbis",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libvorbis.tar.xz",
+      "sha256": "a6a7a609424d9b2a2bdcbefd56af68b2bc23d76a5e1f2d1c640868544280772a"
+    },
+    {
+      "name": "libwebp",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libwebp.tar.xz",
+      "sha256": "df35cdca677b357e0d37535a226a1a249eaca4dac5a09e7a9fe89d05220ebedc"
+    },
+    {
+      "name": "libxmp-lite",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/libxmp-lite.tar.xz",
+      "sha256": "ef490b012bdaea4d7432e21859d60c427da5065703a94cf4c3846601e5055f33"
+    },
+    {
+      "name": "opus",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/opus.tar.xz",
+      "sha256": "f28962484ec1e7768be15cc5269ed082dc72ef533d5f80df3950aa3e4713e6a1"
+    },
+    {
+      "name": "opusfile",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/opusfile.tar.xz",
+      "sha256": "2ee87e625e56e8f25d9abc51061d7a4fab6a8a4ae5ade0ff67c04e2c0bad4bc9"
+    },
+    {
+      "name": "sdl2",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/sdl2.tar.xz",
+      "sha256": "f7318878817e5268fd991a2796d83a544c7688d0c98f510e4d6c9d3b07725e5b"
+    },
+    {
+      "name": "sdl2_image",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/sdl2_image.tar.xz",
+      "sha256": "bba65d4cd694aaf26c0bccac075d9be610f19d7d3a63760e3f300280965dbf6c"
+    },
+    {
+      "name": "sdl2_mixer",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/sdl2_mixer.tar.xz",
+      "sha256": "a41debe26c4080622f24222d657a045f7a33bb70cf6c367490e37eb8d403d4ec"
+    },
+    {
+      "name": "sdl2_ttf",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/sdl2_ttf.tar.xz",
+      "sha256": "da7bad83279d71e41bda8bf995a61594cba7852438181fe9cf07fc3e25f3426b"
+    },
+    {
+      "name": "zlib",
+      "url": "https://github.com/vitasdk/packages/releases/download/master/zlib.tar.xz",
+      "sha256": "f39cea16c176f93dc744597113f093db0d48adf23dd25a14ee0d2ec47df17fa6"
+    }
+  ],
+  "vendored": [
+    {
+      "path": "src/json.hpp",
+      "sha256": "9bea4c8066ef4a1c206b2be5a36302f8926f7fdc6087af5d20b417d0cf103ea6"
+    },
+    {
+      "path": "src/pl_mpeg.h",
+      "sha256": "3a8cb30c83c2a1147719c30fe0c8b93da2987aa43140077c575b39aaa75fc2c9"
+    },
+    {
+      "path": "src/gb18030_table.hpp",
+      "sha256": "030a464041654bbe0dd208a6c707f40f8e1942cc9651830ce4d5f4b6c1cd8e17"
+    },
+    {
+      "path": "third_party/pthread-embedded-63e1cd9.zip",
+      "sha256": "74a3dfce8b5f2aadfcccbdeb9b69d55a9e579e53687979d817bf99a0b15edd90"
+    }
+  ]
+}

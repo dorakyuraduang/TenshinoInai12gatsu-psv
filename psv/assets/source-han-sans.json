@@ -1,0 +1,14 @@
+{
+  "family": "Source Han Sans CN Regular",
+  "upstream": "https://github.com/adobe-fonts/source-han-sans",
+  "commit": "a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2",
+  "fontUrl": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2/SubsetOTF/CN/SourceHanSansCN-Regular.otf",
+  "licenseUrl": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2/LICENSE.txt",
+  "fontFile": "SourceHanSansCN-Regular.otf",
+  "fontSha256": "e2bc8a2e7f37474b774fff8db758681ece40bb6947a90d571bce9dd60671a8e4",
+  "fontGitBlob": "5e6605995d5cbc432c4273f566a5f2b8c376c682",
+  "fontBytes": 8429224,
+  "license": "SIL Open Font License 1.1",
+  "licenseSha256": "fcac737e761ec63dbfbdce11030a1780161920d80315edba9c8beff1c2bac5a2",
+  "modified": false
+}
